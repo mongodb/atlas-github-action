@@ -1,0 +1,18 @@
+name: Test AtlasCLI Action
+on:
+  push:
+jobs:
+  no-version:
+    name: Use AtlasCLI without version input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup AtlasCLI without version input
+        uses: nicohrubec/atlas-github-action@composite-action-poc
+  input-version:
+    name: Use AtlasCLI with version input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup AtlasCLI with version input
+        uses: nicohrubec/atlas-github-action@composite-action-poc
+        with:
+          version: v1.9.0
