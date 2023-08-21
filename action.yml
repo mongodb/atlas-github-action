@@ -1,0 +1,33 @@
+name: 'Atlas CLI GitHub Action'
+description: 'Use AtlasCLI in your GitHub workflow'
+branding:
+  icon: 'terminal'
+  color: 'green'
+inputs:
+  version:
+    description: Version of the Atlas CLI to install
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: Find latest tag
+      if: -z "${{ inputs.version }}"
+      uses: oprypin/find-latest-tag@v1
+      id: find-latest-tag
+      with:
+        repository: mongodb/mongodb-atlas-cli
+        releases-only: true
+        regex: 'atlascli*'
+    - name: Determine tag
+      id: determine-tag
+      shell: bash
+      run: |
+        if [ -z "${{ inputs.version }}" ]
+        then
+          echo "cli-tag=${{ steps.find-latest-tag.outputs.tag }}" >> $GITHUB_OUTPUT
+        else
+          echo "cli-tag=atlascli/${{ inputs.version }}" >> $GITHUB_OUTPUT
+        fi
+    - name: Print latest tag
+      shell: bash
+      run: echo "CLI is at version ${{ steps.determine-tag.outputs.cli-tag }}"
