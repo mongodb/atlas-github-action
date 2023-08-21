@@ -10,6 +10,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Check Runner OS
+      if: ${{ runner.os != 'Linux' }}
+      shell: bash
+      run: |
+        echo "::error title=⛔ error hint::Support Linux Only"
+        exit 1
     - name: Find latest tag
       if: -z "${{ inputs.version }}"
       uses: oprypin/find-latest-tag@v1
@@ -28,6 +34,36 @@ runs:
         else
           echo "cli-tag=atlascli/${{ inputs.version }}" >> $GITHUB_OUTPUT
         fi
-    - name: Print latest tag
+    - name: Download release
+      id: download-release
+      uses: robinraju/release-downloader@v1.8
+      with:
+        repository: mongodb/mongodb-atlas-cli
+        tag: ${{ steps.determine-tag.outputs.cli-tag }}
+        fileName: 'mongodb-atlas-cli*linux*.tar.gz'
+        out-file-path: /tmp
+    - name: Check Atlas CLI is installed
+      id: check-path
       shell: bash
-      run: echo "CLI is at version ${{ steps.determine-tag.outputs.cli-tag }}"
+      run: |
+        if ! which atlas >/dev/null 2>&1; then
+          # execute the following step only if the binary is not in PATH
+          echo "atlas-installed=0" >> $GITHUB_OUTPUT
+        exit 0
+        fi
+        echo "atlas-installed=1" >> $GITHUB_OUTPUT
+    - name: Install AtlasCLI
+      if: steps.check-path.outputs.atlas-installed == 0
+      shell: bash
+      run: |
+        if [ ${{ runner.arch }} = "ARM64" ]; then
+            ARCH="arm64"
+        elif [ ${{ runner.arch }} = "X64" ]; then
+            ARCH="x86_64"
+        else
+          echo "::error title=⛔ error hint::Support ARM64 and AMD64 Only"
+          exit 1
+        fi
+
+        tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
+        sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
