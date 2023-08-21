@@ -22,3 +22,20 @@ jobs:
       - name: Use AtlasCLI
         shell: bash
         run: atlas --help
+  create-delete-project:
+    name: Create and delete project
+    runs-on: ubuntu-latest
+    env:
+      MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+      MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+      MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
+    steps:
+      - name: Setup AtlasCLI and create a project
+        id: create-project
+        uses: mongodb/atlas-github-action@main
+        with:
+          create-project-name: ${{ github.run_id }}
+      - name: delete project
+        uses: mongodb/atlas-github-action@main
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}

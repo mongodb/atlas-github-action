@@ -7,6 +7,16 @@ inputs:
   version:
     description: Version of the Atlas CLI to install
     required: false
+  create-project-name:
+    description: 'Name of the project that will be created.'
+    required: false
+  delete-project-id:
+    description: 'Id of the project that will be deleted.'
+    required: false
+outputs:
+  create-project-id:
+    description: 'ProjectId of the project that was created.'
+    value: ${{ steps.create-project.outputs.create-project-id }}
 runs:
   using: 'composite'
   steps:
@@ -67,3 +77,14 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
+    - name: Create Project
+      if: ${{ inputs.create-project-name }}
+      shell: bash
+      id: create-project
+      run: |
+        projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
+        echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
+    - name: Delete Project
+      if: ${{ inputs.delete-project-id }}
+      shell: bash
+      run: atlas project delete ${{ inputs.delete-project-id }} --force
