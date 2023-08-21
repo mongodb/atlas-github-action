@@ -8,6 +8,9 @@ jobs:
     steps:
       - name: Setup AtlasCLI without version input
         uses: mongodb/atlas-github-action@main
+      - name: Use AtlasCLI
+        shell: bash
+        run: atlas --help
   input-version:
     name: Use AtlasCLI with version input
     runs-on: ubuntu-latest
@@ -16,3 +19,6 @@ jobs:
         uses: mongodb/atlas-github-action@main
         with:
           version: v1.9.0
+      - name: Use AtlasCLI
+        shell: bash
+        run: atlas --help
