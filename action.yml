@@ -22,10 +22,27 @@ inputs:
   project-id:
     description: 'Id of the project.'
     required: false
+  cluster-name:
+    description: 'Name of the cluster.'
+    required: false
+  run-setup:
+    description: 'This command takes you through registration, login, default profile creation and creating 
+      your first free tier cluster'
+    required: false
+    default: 'false'
+  username:
+    description: 'Username for the created cluster.'
+    required: false
+  password:
+    description: 'Password for the created cluster.'
+    required: false
 outputs:
   create-project-id:
     description: 'ProjectId of the project that was created.'
     value: ${{ steps.create-project.outputs.create-project-id }}
+  connection-string:
+    description: 'Connection String to use to connect to the created Cluster.'
+    value: ${{ steps.setup.outputs.connection-string }}
 runs:
   using: 'composite'
   steps:
@@ -87,18 +104,14 @@ runs:
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
     - name: Create Project
-      if: ${{ inputs.create-project-name }}
+      if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
       run: |
         projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
         echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
-    - name: Delete Project
-      if: ${{ inputs.delete-project-id }}
-      shell: bash
-      run: atlas project delete ${{ inputs.delete-project-id }} --force
     - name: Create Cluster
-      if: ${{ inputs.create-cluster-name }}
+      if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
       run: |
         CLUSTER_CONFIG="--tier M0 --provider AWS --region US_EAST_1"
@@ -109,11 +122,33 @@ runs:
           atlas cluster create ${{ inputs.create-cluster-name }} --projectId ${{ inputs.project-id }} ${CLUSTER_CONFIG}
         fi
     - name: Delete Cluster
-      if: ${{ inputs.delete-cluster-name && inputs.project-id }}
+      if: ${{ inputs.delete-cluster-name && inputs.delete-project-id }}
       shell: bash
       run: |
-        atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.project-id }}
-        if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.project-id }} >/dev/null 2>&1; then
+        atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.delete-project-id }}
+        if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.delete-project-id }} >/dev/null 2>&1; then
           echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
           exit 0
         fi
+    - name: Delete Project
+      if: ${{ inputs.delete-project-id }}
+      shell: bash
+      run: atlas project delete ${{ inputs.delete-project-id }} --force
+    - name: Setup
+      if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
+      shell: bash
+      id: setup
+      run: |
+        FLAGS="--force --currentIp --skipMongosh --skipSampleData --username ${{ inputs.username }} --password ${{ inputs.password }}"
+
+        if [ -n "${{ inputs.project-id }}" ]
+        then
+          FLAGS+=" --projectId ${{ inputs.project-id }}"
+        fi
+        if [ -n "${{ inputs.cluster-name }}" ]
+        then
+          FLAGS+=" --clusterName ${{ inputs.cluster-name }}"
+        fi
+
+        connectionString=$(atlas setup ${FLAGS} | sed -n 's/Your connection string: //p')
+        echo "connection-string=$(echo $connectionString)" >> $GITHUB_OUTPUT 
