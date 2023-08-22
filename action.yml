@@ -10,8 +10,17 @@ inputs:
   create-project-name:
     description: 'Name of the project that will be created.'
     required: false
+  create-cluster-name:
+    description: 'Name of the cluster that will be created.'
+    required: false
   delete-project-id:
     description: 'Id of the project that will be deleted.'
+    required: false
+  delete-cluster-name:
+    description: 'Name of the cluster that will be deleted.'
+    required: false
+  project-id:
+    description: 'Id of the project.'
     required: false
 outputs:
   create-project-id:
@@ -88,3 +97,23 @@ runs:
       if: ${{ inputs.delete-project-id }}
       shell: bash
       run: atlas project delete ${{ inputs.delete-project-id }} --force
+    - name: Create Cluster
+      if: ${{ inputs.create-cluster-name }}
+      shell: bash
+      run: |
+        CLUSTER_CONFIG="--tier M0 --provider AWS --region US_EAST_1"
+        if [ -z "${{ inputs.project-id }}" ]
+        then
+          atlas cluster create ${{ inputs.create-cluster-name }} ${CLUSTER_CONFIG}
+        else
+          atlas cluster create ${{ inputs.create-cluster-name }} --projectId ${{ inputs.project-id }} ${CLUSTER_CONFIG}
+        fi
+    - name: Delete Cluster
+      if: ${{ inputs.delete-cluster-name && inputs.project-id }}
+      shell: bash
+      run: |
+        atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.project-id }}
+        if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.project-id }} >/dev/null 2>&1; then
+          echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
+          exit 0
+        fi

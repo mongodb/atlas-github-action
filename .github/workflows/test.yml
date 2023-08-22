@@ -34,8 +34,36 @@ jobs:
         id: create-project
         uses: mongodb/atlas-github-action@main
         with:
-          create-project-name: ${{ github.run_id }}
+          create-project-name: ${{ github.run_id }}-project1
       - name: delete project
         uses: mongodb/atlas-github-action@main
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+  create-delete-cluster:
+    name: Create and delete cluster
+    runs-on: ubuntu-latest
+    env:
+      MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+      MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+      MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
+    steps:
+      - name: Setup AtlasCLI and create a project
+        id: create-project
+        uses: nicohrubec/atlas-github-action@composite-action-poc
+        with:
+          create-project-name: ${{github.run_id}}-project2
+      - name: Create cluster
+        id: create-cluster
+        uses: nicohrubec/atlas-github-action@composite-action-poc
+        with:
+          create-cluster-name: test-cluster
+          project-id: ${{ steps.create-project.outputs.create-project-id }}
+      - name: Delete cluster
+        uses: nicohrubec/atlas-github-action@composite-action-poc
+        with:
+          delete-cluster-name: test-cluster
+          project-id: ${{ steps.create-project.outputs.create-project-id }}
+      - name: delete project
+        uses: nicohrubec/atlas-github-action@composite-action-poc
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
