@@ -1,6 +1,11 @@
 name: Test AtlasCLI Action
 on:
   push:
+env:
+  MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+  MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+  MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
+  MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
 jobs:
   no-version:
     name: Use AtlasCLI without version input
@@ -25,10 +30,6 @@ jobs:
   create-delete-project:
     name: Create and delete project
     runs-on: ubuntu-latest
-    env:
-      MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
-      MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
-      MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
     steps:
       - name: Setup AtlasCLI and create a project
         id: create-project
@@ -42,10 +43,6 @@ jobs:
   create-delete-cluster:
     name: Create and delete cluster
     runs-on: ubuntu-latest
-    env:
-      MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
-      MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
-      MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
     steps:
       - name: Setup AtlasCLI and create a project
         id: create-project
@@ -66,11 +63,6 @@ jobs:
   setup:
     name: Setup and teardown afterwards
     runs-on: ubuntu-latest
-    env:
-      MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
-      MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
-      MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
-      MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
     steps:
       - name: Setup AtlasCLI and create a project
         id: create-project
