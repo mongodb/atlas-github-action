@@ -1,6 +1,8 @@
 name: Test AtlasCLI Action
 on:
   push:
+  pull_request:
+  workflow_dispatch:
 env:
   MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
   MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
