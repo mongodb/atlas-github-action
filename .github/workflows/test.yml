@@ -1,1 +1,103 @@
-
+name: Test AtlasCLI Action
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+env:
+  MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+  MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+  MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
+  MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
+jobs:
+  no-version:
+    name: Use AtlasCLI without version input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup AtlasCLI without version input
+        uses: ./
+      - name: Use AtlasCLI
+        shell: bash
+        run: atlas --help
+  input-version:
+    name: Use AtlasCLI with version input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup AtlasCLI with version input
+        uses: ./
+        with:
+          version: v1.9.0
+      - name: Use AtlasCLI
+        shell: bash
+        run: atlas --help
+  create-delete-project:
+    name: Create and delete project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup AtlasCLI and create a project
+        id: create-project
+        uses: ./
+        with:
+          create-project-name: ${{ github.run_id }}-project1
+      - name: delete project
+        uses: ./
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+  create-delete-cluster:
+    name: Create and delete cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup AtlasCLI and create a project
+        id: create-project
+        uses: ./
+        with:
+          create-project-name: ${{github.run_id}}-project2
+      - name: Create cluster
+        id: create-cluster
+        uses: ./
+        with:
+          create-cluster-name: test-cluster
+          project-id: ${{ steps.create-project.outputs.create-project-id }}
+      - name: Delete cluster and project
+        uses: ./
+        with:
+          delete-cluster-name: test-cluster
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+  setup:
+    name: Setup and teardown afterwards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup AtlasCLI and create a project
+        id: create-project
+        uses: ./
+        with:
+          create-project-name: ${{github.run_id}}-test-setup-project
+      - name: Setup
+        id: setup
+        uses: ./
+        with:
+          run-setup: true
+          project-id: ${{ steps.create-project.outputs.create-project-id }}
+          cluster-name: ${{github.run_id}}-cluster
+          username: ${{ secrets.CLUSTER_USERNAME }}
+          password: ${{ secrets.CLUSTER_PASSWORD }}
+      - name: Retrieve Connection String
+        shell: bash
+        run: |
+          echo "${{ steps.setup.outputs.connection-string }}"
+      - name: Teardown
+        uses: ./
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+          delete-cluster-name: ${{github.run_id}}-cluster
