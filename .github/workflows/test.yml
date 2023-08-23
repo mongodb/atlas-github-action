@@ -10,7 +10,7 @@ env:
   MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
   MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
   MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  MCLI_OPS_MANAGER_BASE_URL: ${{ env.CLOUD_DEV_URL }}
+  MCLI_OPS_MANAGER_BASE_URL: ${{ vars.CLOUD_DEV_URL }}
 jobs:
   no-version:
     name: Use AtlasCLI without version input
