@@ -24,8 +24,10 @@ jobs:
     name: Use AtlasCLI with version input
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup AtlasCLI with version input
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           version: v1.9.0
       - name: Use AtlasCLI
@@ -35,32 +37,36 @@ jobs:
     name: Create and delete project
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup AtlasCLI and create a project
         id: create-project
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           create-project-name: ${{ github.run_id }}-project1
       - name: delete project
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
   create-delete-cluster:
     name: Create and delete cluster
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup AtlasCLI and create a project
         id: create-project
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           create-project-name: ${{github.run_id}}-project2
       - name: Create cluster
         id: create-cluster
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           create-cluster-name: test-cluster
           project-id: ${{ steps.create-project.outputs.create-project-id }}
       - name: Delete cluster and project
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           delete-cluster-name: test-cluster
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
@@ -68,14 +74,16 @@ jobs:
     name: Setup and teardown afterwards
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup AtlasCLI and create a project
         id: create-project
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           create-project-name: ${{github.run_id}}-test-setup-project
       - name: Setup
         id: setup
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           run-setup: true
           project-id: ${{ steps.create-project.outputs.create-project-id }}
@@ -87,7 +95,7 @@ jobs:
         run: |
           echo "${{ steps.setup.outputs.connection-string }}"
       - name: Teardown
-        uses: mongodb/atlas-github-action@main
+        uses: ./
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: ${{github.run_id}}-cluster
