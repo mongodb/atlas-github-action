@@ -5,11 +5,13 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+
 env:
   MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY_PROD }}
   MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY_PROD }}
   MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID_PROD }}
   MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID_PROD }}
+
 jobs:
   no-version:
     name: Use AtlasCLI without version input
@@ -22,6 +24,7 @@ jobs:
       - name: Use AtlasCLI
         shell: bash
         run: atlas --help
+
   input-version:
     name: Use AtlasCLI with version input
     runs-on: ubuntu-latest
@@ -35,6 +38,7 @@ jobs:
       - name: Use AtlasCLI
         shell: bash
         run: atlas --help
+
   create-delete-project:
     name: Create and delete project
     runs-on: ubuntu-latest
@@ -50,6 +54,7 @@ jobs:
         uses: ./
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+
   create-delete-cluster:
     name: Create and delete cluster
     runs-on: ubuntu-latest
@@ -72,6 +77,7 @@ jobs:
         with:
           delete-cluster-name: test-cluster
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+
   setup:
     name: Setup and teardown afterwards
     runs-on: ubuntu-latest

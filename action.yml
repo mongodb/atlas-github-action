@@ -3,6 +3,7 @@ description: 'Use AtlasCLI in your GitHub workflow'
 branding:
   icon: 'terminal'
   color: 'green'
+
 inputs:
   version:
     description: Version of the Atlas CLI to install
@@ -48,6 +49,7 @@ inputs:
   password:
     description: 'Password for the created cluster.'
     required: false
+
 outputs:
   create-project-id:
     description: 'ProjectId of the project that was created.'
@@ -55,6 +57,7 @@ outputs:
   connection-string:
     description: 'Connection String to use to connect to the created Cluster.'
     value: ${{ steps.setup.outputs.connection-string }}
+
 runs:
   using: 'composite'
   steps:
@@ -64,6 +67,7 @@ runs:
       run: |
         echo "::error title=⛔ error hint::Support Linux Only"
         exit 1
+
     - name: Find latest tag
       if: -z "${{ inputs.version }}"
       uses: oprypin/find-latest-tag@v1
@@ -72,6 +76,7 @@ runs:
         repository: mongodb/mongodb-atlas-cli
         releases-only: true
         regex: 'atlascli*'
+
     - name: Determine tag
       id: determine-tag
       shell: bash
@@ -82,6 +87,7 @@ runs:
         else
           echo "cli-tag=atlascli/${{ inputs.version }}" >> $GITHUB_OUTPUT
         fi
+
     - name: Download release
       id: download-release
       uses: robinraju/release-downloader@v1.8
@@ -90,6 +96,7 @@ runs:
         tag: ${{ steps.determine-tag.outputs.cli-tag }}
         fileName: 'mongodb-atlas-cli*linux*.tar.gz'
         out-file-path: /tmp
+
     - name: Check Atlas CLI is installed
       id: check-path
       shell: bash
@@ -115,6 +122,7 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
+
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
@@ -122,17 +130,20 @@ runs:
       run: |
         projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
         echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
+
     - name: Create Cluster
       if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
       run: |
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
+  
         if [ -z "${{ inputs.project-id }}" ]
         then
           atlas cluster create ${{ inputs.create-cluster-name }} ${CLUSTER_CONFIG}
         else
           atlas cluster create ${{ inputs.create-cluster-name }} --projectId ${{ inputs.project-id }} ${CLUSTER_CONFIG}
         fi
+
     - name: Delete Cluster
       if: ${{ inputs.delete-cluster-name && inputs.delete-project-id }}
       shell: bash
@@ -142,6 +153,7 @@ runs:
           echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
           exit 0
         fi
+
     - name: Delete Project
       if: ${{ inputs.delete-project-id }}
       shell: bash
