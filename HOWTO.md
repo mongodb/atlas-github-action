@@ -1,9 +1,9 @@
 # Run Atlas CLI Commands with GitHub Actions
 
-This guide provides getting started instructions for the official Atlas CLI GitHub Action.
+This guide provides getting started instructions for the official [Atlas CLI](https://github.com/mongodb/mongodb-atlas-cli) GitHub Action.
 
-By default, this Action uses the latest [Atlas CLI](https://github.com/mongodb/mongodb-atlas-cli) version.
-The version can be configured with the version input parameter.
+This Action allows you to run any Atlas CLI command in your own GitHub workflows.
+By default, the latest Atlas CLI version is used. The version can be configured with the 'version' input parameter.
 
 ## Complete the prerequisites
 
@@ -12,6 +12,11 @@ Before you begin, complete the following prerequisites:
 2. Add the API Keys to the [repository secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
 3. For authentication the environment variables MONGODB_ATLAS_PUBLIC_API_KEY and MONGODB_ATLAS_PRIVATE_API_KEY need to be set to the configured API keys in the workflow.
 See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported environment variables.
+
+## Configuration
+
+To run CLI commands with this Action you can either use custom commands (see Basic workflow below) or use the configuration parameters
+to run predefined workflows. Check out the [action.yml](action.yml) to find out which inputs/outputs are available.
 
 ## Example workflows
 
