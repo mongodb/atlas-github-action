@@ -8,7 +8,7 @@ See our [HOWTO.md](HOWTO.md) guide.
 
 ## Limitations
 1. This Action only supports Linux runners (e.g. ubuntu-latest).
-2. version only last one officially supported
+2. Officially Atlas CLI only supports the latest CLI version.
 
 ## License
 

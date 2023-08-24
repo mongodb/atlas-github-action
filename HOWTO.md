@@ -11,7 +11,7 @@ Before you begin, complete the following prerequisites:
 1. Configure Atlas CLI API Keys for the organisation or project that will be used in the Action.
 2. Add the API Keys to the [repository secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
 3. For authentication the environment variables MONGODB_ATLAS_PUBLIC_API_KEY and MONGODB_ATLAS_PRIVATE_API_KEY need to be set to the configured API keys in the workflow.
-See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported variables.
+See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported environment variables.
 
 ## Example workflows
 
@@ -35,7 +35,7 @@ jobs:
 ```
 
 ### Setup and Teardown
-This workflow sets up a project and a free cluster. It retrieves the connection string to connect to the created cluster.
+This workflow sets up a project and a free cluster. It retrieves the connection string which can be used to connect to the created cluster.
 Afterwards it deletes the project and cluster that was set up.
 ```yaml
 on: [push]
