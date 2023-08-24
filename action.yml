@@ -30,6 +30,18 @@ inputs:
       your first free tier cluster'
     required: false
     default: 'false'
+  tier:
+    description: 'Tier of the created cluster.'
+    required: false
+    default: 'M0'
+  provider:
+    description: 'Provider of the created cluster.'
+    required: false
+    default: 'AWS'
+  region:
+    description: 'Region the cluster will be created in.'
+    required: false
+    default: US_EAST_1
   username:
     description: 'Username for the created cluster.'
     required: false
@@ -114,7 +126,7 @@ runs:
       if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
       run: |
-        CLUSTER_CONFIG="--tier M0 --provider AWS --region US_EAST_1"
+        CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
         if [ -z "${{ inputs.project-id }}" ]
         then
           atlas cluster create ${{ inputs.create-cluster-name }} ${CLUSTER_CONFIG}
