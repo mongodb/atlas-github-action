@@ -15,6 +15,8 @@ See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/sta
 
 ## Example workflows
 
+See [here](https://github.com/mongodb/atlas-github-action/blob/main/.github/workflows/test.yml) for more examples.
+
 ### Basic
 This workflow installs the CLI and prints the CLI version.
 ```yaml
