@@ -152,6 +152,7 @@ runs:
       id: setup
       run: |
         FLAGS="--force --currentIp --skipMongosh --skipSampleData --username ${{ inputs.username }} --password ${{ inputs.password }}"
+        CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
 
         if [ -n "${{ inputs.project-id }}" ]
         then
@@ -162,5 +163,5 @@ runs:
           FLAGS+=" --clusterName ${{ inputs.cluster-name }}"
         fi
 
-        connectionString=$(atlas setup ${FLAGS} | sed -n 's/Your connection string: //p')
+        connectionString=$(atlas setup ${FLAGS} ${CLUSTER_CONFIG} | sed -n 's/Your connection string: //p')
         echo "connection-string=$(echo $connectionString)" >> $GITHUB_OUTPUT 
