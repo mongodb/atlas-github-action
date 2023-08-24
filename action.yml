@@ -158,6 +158,7 @@ runs:
       if: ${{ inputs.delete-project-id }}
       shell: bash
       run: atlas project delete ${{ inputs.delete-project-id }} --force
+
     - name: Setup
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
       shell: bash
