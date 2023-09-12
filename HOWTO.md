@@ -3,24 +3,26 @@
 This guide provides getting started instructions for the official [Atlas CLI](https://github.com/mongodb/mongodb-atlas-cli) GitHub Action.
 
 This Action allows you to run any Atlas CLI command in your own GitHub workflows.
-By default, the latest Atlas CLI version is used. The version can be configured with the 'version' input parameter.
+By default, this Action uses the latest version of the Atlas CLI. The version can be configured with the 'version' input parameter, but only the
+latest version is officially supported.
 
 ## Complete the prerequisites
 
 Before you begin, complete the following prerequisites:
-1. Configure Atlas CLI API Keys for the organisation or project that will be used in the Action.
+
+1. [Configure Atlas CLI API Keys](https://www.mongodb.com/docs/atlas/configure-api-access/) for your organization or project.
 2. Add the API Keys to the [repository secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
-3. For authentication the environment variables MONGODB_ATLAS_PUBLIC_API_KEY and MONGODB_ATLAS_PRIVATE_API_KEY need to be set to the configured API keys in the workflow.
+3. Set the environment variables `MONGODB_ATLAS_PUBLIC_API_KEY` and `MONGODB_ATLAS_PRIVATE_API_KEY` to the Atlas CLI API Keys you configured.
 See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported environment variables.
 
 ## Configuration
 
 To run CLI commands with this Action you can either use custom commands (see Basic workflow below) or use the configuration parameters
-to run predefined workflows. Check out the [action.yml](action.yml) to find out which inputs/outputs are available.
+to run predefined workflows. See [action.yml](action.yml) for available inputs/outputs.
 
 ## Example workflows
 
-See [here](https://github.com/mongodb/atlas-github-action/blob/main/.github/workflows/test.yml) for more examples.
+See [test.yml](https://github.com/mongodb/atlas-github-action/blob/main/.github/workflows/test.yml) for more examples.
 
 ### Basic
 This workflow installs the CLI and prints the CLI version.
@@ -42,8 +44,8 @@ jobs:
 ```
 
 ### Setup and Teardown
-This workflow sets up a project and a free cluster. It retrieves the connection string which can be used to connect to the created cluster.
-Afterwards it deletes the project and cluster that was set up.
+This workflow sets up a project and creates a free-tier cluster. It retrieves the connection string which can be used to connect to the new cluster.
+Afterwards, it deletes the project and cluster.
 ```yaml
 on: [push]
 
