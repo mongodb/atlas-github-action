@@ -8,7 +8,7 @@ See our [HOWTO.md](HOWTO.md) guide.
 
 ## Limitations
 1. This Action only supports Linux runners (e.g. ubuntu-latest).
-2. MongoDB Atlas CLI only officially supports the latest version of this GitHub Action.
+2. This Action only officially supports the latest version of the Atlas CLI.
 
 ## License
 
