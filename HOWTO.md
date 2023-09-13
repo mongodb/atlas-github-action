@@ -44,7 +44,7 @@ jobs:
 ```
 
 ### Setup and Teardown
-This workflow sets up a project and creates a free-tier cluster. It retrieves the connection string which can be used to connect to the new cluster.
+This workflow sets up a project and creates a free cluster. It retrieves the connection string which can be used to connect to the new cluster.
 Afterwards, it deletes the project and cluster.
 ```yaml
 on: [push]
