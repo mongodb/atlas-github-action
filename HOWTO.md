@@ -64,12 +64,12 @@ jobs:
     steps:
       - name: Setup AtlasCLI and create a project
         id: create-project
-        uses: mongodb/mongodb-atlas-cli@main
+        uses: mongodb/atlas-github-action@main
         with:
           create-project-name: test-setup-project
       - name: Run setup
         id: setup
-        uses: mongodb/mongodb-atlas-cli@main
+        uses: mongodb/atlas-github-action@main
         with:
           run-setup: true
           project-id: ${{ steps.create-project.outputs.create-project-id }}
@@ -81,7 +81,7 @@ jobs:
         run: |
           echo "${{ steps.setup.outputs.connection-string }}"
       - name: Teardown
-        uses: mongodb/mongodb-atlas-cli@main
+        uses: mongodb/atlas-github-action@main
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: test-cluster
