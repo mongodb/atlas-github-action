@@ -122,6 +122,7 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
+        MONGODB_ATLAS_HOSTNAME="actions" /usr/bin/atlas
 
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
