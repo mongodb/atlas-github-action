@@ -7,7 +7,7 @@ This is the official GitHub Action for the [MongoDB Atlas CLI](https://github.co
 See our [HOWTO.md](HOWTO.md) guide.
 
 ## Limitations
-This Action only supports Linux runners (e.g. ubuntu-latest).
+This Action supports only Linux runners (e.g. ubuntu-latest).
 
 ## License
 
