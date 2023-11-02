@@ -89,6 +89,8 @@ runs:
         fi
 
     - name: Download release
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       id: download-release
       uses: robinraju/release-downloader@v1.8
       with:
@@ -108,8 +110,6 @@ runs:
         fi
         echo "atlas-installed=1" >> $GITHUB_OUTPUT
     - name: Install AtlasCLI
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: steps.check-path.outputs.atlas-installed == 0
       shell: bash
       run: |
@@ -126,8 +126,6 @@ runs:
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
         
     - name: Create Project
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
