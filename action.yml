@@ -58,6 +58,9 @@ outputs:
     description: 'Connection String to use to connect to the created Cluster.'
     value: ${{ steps.setup.outputs.connection-string }}
 
+env:
+  MONGODB_ATLAS_IS_CONTAINERIZED: "true"
+
 runs:
   using: 'composite'
   steps:
@@ -122,7 +125,6 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
-        MONGODB_ATLAS_IS_CONTAINERIZED="true" /usr/bin/atlas
         
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
