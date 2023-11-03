@@ -58,12 +58,13 @@ outputs:
     description: 'Connection String to use to connect to the created Cluster.'
     value: ${{ steps.setup.outputs.connection-string }}
 
+env:
+  MONGODB_ATLAS_IS_CONTAINERIZED: "true"
+
 runs:
   using: 'composite'
   steps:
     - name: Check Runner OS
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ runner.os != 'Linux' }}
       shell: bash
       run: |
