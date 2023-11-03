@@ -69,6 +69,8 @@ runs:
         exit 1
 
     - name: Find latest tag
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: -z "${{ inputs.version }}"
       uses: oprypin/find-latest-tag@v1
       id: find-latest-tag
@@ -89,8 +91,6 @@ runs:
         fi
 
     - name: Download release
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       id: download-release
       uses: robinraju/release-downloader@v1.8
       with:
