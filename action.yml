@@ -61,9 +61,9 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Set Up Telemetry
-      run: echo "::set-env name=MONGODB_ATLAS_IS_CONTAINERIZED::true"
     - name: Check Runner OS
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ runner.os != 'Linux' }}
       shell: bash
       run: |
@@ -71,6 +71,8 @@ runs:
         exit 1
 
     - name: Find latest tag
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: -z "${{ inputs.version }}"
       uses: oprypin/find-latest-tag@v1
       id: find-latest-tag
