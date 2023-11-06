@@ -128,6 +128,8 @@ runs:
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
         
     - name: Create Project
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
