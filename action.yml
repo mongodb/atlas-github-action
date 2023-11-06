@@ -90,6 +90,8 @@ runs:
 
     - name: Download release
       id: download-release
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       uses: robinraju/release-downloader@v1.8
       with:
         repository: mongodb/mongodb-atlas-cli
