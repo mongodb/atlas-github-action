@@ -79,6 +79,8 @@ runs:
 
     - name: Determine tag
       id: determine-tag
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       shell: bash
       run: |
         if [ -z "${{ inputs.version }}" ]
