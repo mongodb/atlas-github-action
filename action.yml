@@ -123,6 +123,7 @@ runs:
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
         MONGODB_ATLAS_HOSTNAME="actions" /usr/bin/atlas
+        
 
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
@@ -161,6 +162,8 @@ runs:
       run: atlas project delete ${{ inputs.delete-project-id }} --force
 
     - name: Setup
+      env:
+        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
       shell: bash
       id: setup
