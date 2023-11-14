@@ -37,7 +37,7 @@ jobs:
     
     steps:
       - name: Setup AtlasCLI
-        uses: mongodb/mongodb-atlas-cli@main
+        uses: mongodb/atlas-github-action@main
       - name: Use AtlasCLI
         shell: bash
         run: atlas --version # Print Atlas CLI Version
