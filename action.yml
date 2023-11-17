@@ -62,17 +62,14 @@ runs:
   using: 'composite'
   steps:
     - name: Check Runner OS
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ runner.os != 'Linux' }}
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         echo "::error title=⛔ error hint::Support Linux Only"
         exit 1
 
     - name: Find latest tag
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: -z "${{ inputs.version }}"
       uses: oprypin/find-latest-tag@v1
       id: find-latest-tag
@@ -83,10 +80,9 @@ runs:
 
     - name: Determine tag
       id: determine-tag
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         if [ -z "${{ inputs.version }}" ]
         then
           echo "cli-tag=${{ steps.find-latest-tag.outputs.tag }}" >> $GITHUB_OUTPUT
@@ -96,8 +92,6 @@ runs:
 
     - name: Download release
       id: download-release
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       uses: robinraju/release-downloader@v1.8
       with:
         repository: mongodb/mongodb-atlas-cli
@@ -107,10 +101,9 @@ runs:
 
     - name: Check Atlas CLI is installed
       id: check-path
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         if ! which atlas >/dev/null 2>&1; then
           # execute the following step only if the binary is not in PATH
           echo "atlas-installed=0" >> $GITHUB_OUTPUT
@@ -118,11 +111,10 @@ runs:
         fi
         echo "atlas-installed=1" >> $GITHUB_OUTPUT
     - name: Install AtlasCLI
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: steps.check-path.outputs.atlas-installed == 0
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         if [ ${{ runner.arch }} = "ARM64" ]; then
             ARCH="arm64"
         elif [ ${{ runner.arch }} = "X64" ]; then
@@ -135,13 +127,13 @@ runs:
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
         
+
     - name: Create Project
-      env:
-        MONGODB_ATLAS_IS_CONTAINERIZED: "true"
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
         echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
 
@@ -149,6 +141,7 @@ runs:
       if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
   
         if [ -z "${{ inputs.project-id }}" ]
@@ -162,6 +155,7 @@ runs:
       if: ${{ inputs.delete-cluster-name && inputs.delete-project-id }}
       shell: bash
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.delete-project-id }}
         if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.delete-project-id }} >/dev/null 2>&1; then
           echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
@@ -171,13 +165,16 @@ runs:
     - name: Delete Project
       if: ${{ inputs.delete-project-id }}
       shell: bash
-      run: atlas project delete ${{ inputs.delete-project-id }} --force
+      run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
+        atlas project delete ${{ inputs.delete-project-id }} --force
 
     - name: Setup
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
       shell: bash
       id: setup
       run: |
+        export MONGODB_ATLAS_IS_CONTAINERIZED="true"
         FLAGS="--force --currentIp --skipMongosh --skipSampleData --username ${{ inputs.username }} --password ${{ inputs.password }}"
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
 
