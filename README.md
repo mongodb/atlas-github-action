@@ -42,7 +42,7 @@ jobs:
     
     steps:
       - name: Setup AtlasCLI
-        uses: mongodb/atlas-github-action@main
+        uses: mongodb/atlas-github-action@@v0.2.0
       - name: Use AtlasCLI
         shell: bash
         run: atlas --version # Print Atlas CLI Version
@@ -69,12 +69,12 @@ jobs:
     steps:
       - name: Setup AtlasCLI and create a project
         id: create-project
-        uses: mongodb/atlas-github-action@latest
+        uses: mongodb/atlas-github-action@@v0.2.0
         with:
           create-project-name: test-setup-project
       - name: Run setup
         id: setup
-        uses: mongodb/atlas-github-action@latest
+        uses: mongodb/atlas-github-action@@v0.2.0
         with:
           run-setup: true
           project-id: ${{ steps.create-project.outputs.create-project-id }}
@@ -86,7 +86,7 @@ jobs:
         run: |
           echo "${{ steps.setup.outputs.connection-string }}"
       - name: Teardown
-        uses: mongodb/atlas-github-action@latest
+        uses: mongodb/atlas-github-action@@v0.2.0
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: test-cluster
