@@ -83,6 +83,16 @@ runs:
       shell: bash
       run: |
         export MONGODB_ATLAS_IS_CONTAINERIZED="true"
+        if [ "$IS_CONTAINERIZED" = "true" ]; then
+          echo "IS_CONTAINERIZED is set to true"
+        else
+          echo "IS_CONTAINERIZED is not set to true"
+        fi
+        if [ "$GITHUB_ACTIONS" = "true" ]; then
+          echo "GITHUB_ACTIONS is set to true"
+        else
+          echo "GITHUB_ACTIONS is not set to true"
+        fi
         if [ -z "${{ inputs.version }}" ]
         then
           echo "cli-tag=${{ steps.find-latest-tag.outputs.tag }}" >> $GITHUB_OUTPUT
