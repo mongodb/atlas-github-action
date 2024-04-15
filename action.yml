@@ -90,7 +90,7 @@ runs:
 
     - name: Download release
       id: download-release
-      uses: robinraju/release-downloader@v1.8
+      uses: robinraju/release-downloader@v1.10
       with:
         repository: mongodb/mongodb-atlas-cli
         tag: ${{ steps.determine-tag.outputs.cli-tag }}
