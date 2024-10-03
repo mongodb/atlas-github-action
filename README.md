@@ -1,6 +1,6 @@
 # atlas-github-action
 
-This is the official GitHub Action for the [MongoDB Atlas CLI](https://github.com/mongodb/mongodb-atlas-cli).
+This is the official GitHub Action for the [MongoDB Atlas CLI](https://github.com/mongodb/mongodb-atlas-cli), published on the [GitHub Marketplace](https://github.com/marketplace/actions/atlas-cli-github-action)
 
 ## Getting started
 
