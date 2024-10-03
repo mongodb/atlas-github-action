@@ -122,11 +122,13 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
-
+        
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
         projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
         echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
@@ -134,6 +136,8 @@ runs:
     - name: Create Cluster
       if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
   
@@ -147,6 +151,8 @@ runs:
     - name: Delete Cluster
       if: ${{ inputs.delete-cluster-name && inputs.delete-project-id }}
       shell: bash
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
         atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.delete-project-id }}
         if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.delete-project-id }} >/dev/null 2>&1; then
@@ -157,12 +163,17 @@ runs:
     - name: Delete Project
       if: ${{ inputs.delete-project-id }}
       shell: bash
-      run: atlas project delete ${{ inputs.delete-project-id }} --force
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
+      run: | 
+        atlas project delete ${{ inputs.delete-project-id }} --force
 
     - name: Setup
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
       shell: bash
       id: setup
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
         FLAGS="--force --currentIp --skipMongosh --skipSampleData --username ${{ inputs.username }} --password ${{ inputs.password }}"
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
