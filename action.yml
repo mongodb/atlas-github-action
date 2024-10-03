@@ -122,22 +122,23 @@ runs:
 
         tar -C /tmp -xzf /tmp/mongodb-atlas-cli_*_linux_${ARCH}.tar.gz
         sudo mv /tmp/mongodb-atlas-cli_*_linux_${ARCH}/bin/atlas /usr/bin
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
-
+        
     - name: Create Project
       if: ${{ inputs.create-project-name && inputs.run-setup == 'false' }}
       shell: bash
       id: create-project
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
         projectId=$(atlas project create "${{ inputs.create-project-name }}" -o json-path="$.id")
         echo "create-project-id=$(echo $projectId)" >> $GITHUB_OUTPUT
 
     - name: Create Cluster
       if: ${{ inputs.create-cluster-name && inputs.run-setup == 'false' }}
       shell: bash
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
   
         if [ -z "${{ inputs.project-id }}" ]
@@ -150,8 +151,9 @@ runs:
     - name: Delete Cluster
       if: ${{ inputs.delete-cluster-name && inputs.delete-project-id }}
       shell: bash
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
         atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.delete-project-id }}
         if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.delete-project-id }} >/dev/null 2>&1; then
           echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
@@ -161,16 +163,18 @@ runs:
     - name: Delete Project
       if: ${{ inputs.delete-project-id }}
       shell: bash
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: | 
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
         atlas project delete ${{ inputs.delete-project-id }} --force
 
     - name: Setup
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
       shell: bash
       id: setup
+      env:
+        ATLAS_GITHUB_ACTION: "actions" 
       run: |
-        ATLAS_GITHUB_ACTION="actions" /usr/bin/atlas
         FLAGS="--force --currentIp --skipMongosh --skipSampleData --username ${{ inputs.username }} --password ${{ inputs.password }}"
         CLUSTER_CONFIG="--tier ${{ inputs.tier }} --provider ${{ inputs.provider }} --region ${{ inputs.region }}"
 
