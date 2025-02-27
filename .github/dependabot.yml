@@ -6,4 +6,4 @@ updates:
       interval: weekly
       day: monday
     reviewers:
-      - "mongodb/APIx1"
+      - "mongodb/apix-2"
