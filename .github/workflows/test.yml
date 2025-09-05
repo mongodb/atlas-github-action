@@ -107,3 +107,46 @@ jobs:
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: ${{github.run_id}}-cluster
+
+  test-service-account-authentication:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: create a service account and get client ID and client secret
+        id: generate_sa
+        env:
+          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
+          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
+          MONGODB_ATLAS_ORG_ID: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+        run: |
+          bash build/generate-service-account.sh
+      - name: create project
+        env: 
+            MONGODB_ATLAS_PUBLIC_API_KEY: "" # Temporarily set to empty so that the action uses the client ID and client secret
+            MONGODB_ATLAS_PRIVATE_API_KEY: "" 
+            MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+            MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
+        uses: mongodb/atlas-github-action@v0.2.0
+        id: create-project
+        with:
+          create-project-name: ${{ github.run_id }}-project1
+      - name: delete project
+        env: 
+            MONGODB_ATLAS_PUBLIC_API_KEY: ""
+            MONGODB_ATLAS_PRIVATE_API_KEY: ""
+            MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+            MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
+        uses: mongodb/atlas-github-action@v0.2.0
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+
+      - name: delete the service account
+        env:
+          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
+          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
+          MONGODB_ATLAS_ORG_ID: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+          CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+        run: |
+          bash build/terminate-service-account.sh
