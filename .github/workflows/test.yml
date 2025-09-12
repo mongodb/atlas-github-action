@@ -110,16 +110,17 @@ jobs:
           delete-cluster-name: ${{github.run_id}}-cluster
 
   service-account-authentication:
+    name: Setup a Service Account and create a project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: create a service account and get client ID and client secret
+      - name: Create a Service Account and get client ID and client secret
         id: generate_sa
         run: |
           bash build/generate-service-account.sh
-      - name: create project
+      - name: Create a project
         env: 
             MONGODB_ATLAS_PUBLIC_API_KEY: "" # Temporarily set to empty so that the action uses the client ID and client secret
             MONGODB_ATLAS_PRIVATE_API_KEY: "" 
@@ -129,7 +130,7 @@ jobs:
         id: create-project
         with:
           create-project-name: ${{ github.run_id }}-project1
-      - name: delete project
+      - name: Delete a project
         env: 
             MONGODB_ATLAS_PUBLIC_API_KEY: ""
             MONGODB_ATLAS_PRIVATE_API_KEY: ""
@@ -139,7 +140,7 @@ jobs:
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
 
-      - name: delete the service account
+      - name: Delete the Service Account
         env:
           CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
         run: |
