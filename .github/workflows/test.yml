@@ -108,7 +108,7 @@ jobs:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: ${{github.run_id}}-cluster
 
-  test-service-account-authentication:
+  service-account-authentication:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -117,9 +117,9 @@ jobs:
       - name: create a service account and get client ID and client secret
         id: generate_sa
         env:
-          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
-          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
-          MONGODB_ATLAS_ORG_ID: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+          MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
         run: |
           bash build/generate-service-account.sh
       - name: create project
@@ -144,9 +144,9 @@ jobs:
 
       - name: delete the service account
         env:
-          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.MONGODB_ATLAS_PUBLIC_API_KEY }}
-          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.MONGODB_ATLAS_PRIVATE_API_KEY }}
-          MONGODB_ATLAS_ORG_ID: ${{ secrets.MONGODB_ATLAS_ORG_ID }}
+          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
+          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
+          MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
           CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
         run: |
           bash build/terminate-service-account.sh
