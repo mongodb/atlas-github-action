@@ -116,10 +116,6 @@ jobs:
 
       - name: create a service account and get client ID and client secret
         id: generate_sa
-        env:
-          MONGODB_ATLAS_PUBLIC_API_KEY: ${{ secrets.PUBLIC_API_KEY }}
-          MONGODB_ATLAS_PRIVATE_API_KEY: ${{ secrets.PRIVATE_API_KEY }}
-          MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
         run: |
           bash build/generate-service-account.sh
       - name: create project
