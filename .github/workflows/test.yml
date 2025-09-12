@@ -129,7 +129,7 @@ jobs:
         uses: mongodb/atlas-github-action@v0.2.0
         id: create-project
         with:
-          create-project-name: ${{ github.run_id }}-project1
+          create-project-name: ${{ github.run_id }}-project3
       - name: Delete a project
         env: 
             MONGODB_ATLAS_PUBLIC_API_KEY: ""
