@@ -95,7 +95,6 @@ jobs:
           delete-cluster-name: test-cluster
 ```
 
-<!-- TODO: test the below example once CLI 1.47.0 is released-->
 ### List Clusters with Service Account Credentials
 This workflow uses Service Account credentials to authenticate and lists all clusters in a specified project. The output is saved to a file for later use.
 
