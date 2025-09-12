@@ -12,6 +12,7 @@ env:
   MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }}
   MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MONGODB_ATLAS_OPS_MANAGER_URL: ${{ vars.CLOUD_DEV_URL }}
+  MONGODB_ATLAS_SILENCE_STORAGE_WARNING: "true"
 jobs:
   no-version:
     name: Use AtlasCLI without version input
@@ -107,3 +108,40 @@ jobs:
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: ${{github.run_id}}-cluster
+
+  service-account-authentication:
+    name: Setup a Service Account and create a project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create a Service Account and get client ID and client secret
+        id: generate_sa
+        run: |
+          bash build/generate-service-account.sh
+      - name: Create a project
+        env: 
+            MONGODB_ATLAS_PUBLIC_API_KEY: "" # Temporarily set to empty so that the action uses the client ID and client secret
+            MONGODB_ATLAS_PRIVATE_API_KEY: "" 
+            MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+            MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
+        uses: mongodb/atlas-github-action@v0.2.0
+        id: create-project
+        with:
+          create-project-name: ${{ github.run_id }}-project3
+      - name: Delete a project
+        env: 
+            MONGODB_ATLAS_PUBLIC_API_KEY: ""
+            MONGODB_ATLAS_PRIVATE_API_KEY: ""
+            MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+            MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
+        uses: mongodb/atlas-github-action@v0.2.0
+        with:
+          delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
+
+      - name: Delete the Service Account
+        env:
+          CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
+        run: |
+          bash build/terminate-service-account.sh

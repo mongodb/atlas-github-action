@@ -16,10 +16,13 @@ latest version is officially supported.
 
 Before you begin, complete the following prerequisites:
 
-1. [Configure Atlas CLI API Keys](https://www.mongodb.com/docs/atlas/configure-api-access/) for your organization or project.
-2. Add the API Keys to the [repository secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
-3. Set the environment variables `MONGODB_ATLAS_PUBLIC_API_KEY` and `MONGODB_ATLAS_PRIVATE_API_KEY` to the Atlas CLI API Keys you configured.
-See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported environment variables.
+1. [Configure programmatic authenticaiton](https://www.mongodb.com/docs/atlas/configure-api-access/) for your organization or project.
+2. Add the authentication credentials to the [repository secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
+3. In your workflow, set the appropriate environment variables using the secrets you configured in step 2.  
+   - For Service Account authentication, set `MONGODB_ATLAS_CLIENT_ID` and `MONGODB_ATLAS_CLIENT_SECRET`.  
+   - For API key authentication, set `MONGODB_ATLAS_PUBLIC_API_KEY` and `MONGODB_ATLAS_PRIVATE_API_KEY`.  
+   
+   See [Atlas CLI Environment Variables](https://www.mongodb.com/docs/atlas/cli/stable/atlas-cli-env-variables/) for all supported environment variables.
 
 ## Configuration
 
@@ -49,7 +52,7 @@ jobs:
 ```
 
 ### Setup and Teardown
-This workflow sets up a project and creates a free cluster. It retrieves the connection string which can be used to connect to the new cluster.
+This workflow sets up a project and creates a free cluster using an API Key to authenticate. It retrieves the connection string which can be used to connect to the new cluster.
 Afterwards, it deletes the project and cluster.
 ```yaml
 on: [push]
@@ -90,6 +93,38 @@ jobs:
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
           delete-cluster-name: test-cluster
+```
+
+### List Clusters with Service Account Credentials
+This workflow uses Service Account credentials to authenticate and lists all clusters in a specified project. The output is saved to a file for later use.
+
+```yaml
+on: [push]
+
+name: Atlas CLI List Clusters Example
+
+env:
+  MONGODB_ATLAS_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  MONGODB_ATLAS_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+  MONGODB_ATLAS_ORG_ID: ${{ secrets.ORG_ID }} # default organisation ID
+  MONGODB_ATLAS_PROJECT_ID: ${{ secrets.PROJECT_ID }} # default project ID
+
+jobs:
+  list-clusters:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup AtlasCLI
+        uses: mongodb/atlas-github-action@v0.2.0
+      - name: List Clusters
+        shell: bash
+        run: |
+          atlas cluster list --projectId "$MONGODB_ATLAS_PROJECT_ID" --output json > clusters.json
+      - name: Upload Cluster List
+        uses: actions/upload-artifact@v4
+        with:
+          name: clusters-list
+          path: clusters.json
 ```
 
 
