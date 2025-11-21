@@ -143,9 +143,9 @@ runs:
   
         if [ -z "${{ inputs.project-id }}" ]
         then
-          atlas cluster create ${{ inputs.create-cluster-name }} ${CLUSTER_CONFIG}
+          atlas cluster create "${{ inputs.create-cluster-name }}" ${CLUSTER_CONFIG}
         else
-          atlas cluster create ${{ inputs.create-cluster-name }} --projectId ${{ inputs.project-id }} ${CLUSTER_CONFIG}
+          atlas cluster create "${{ inputs.create-cluster-name }}" --projectId "${{ inputs.project-id }}" ${CLUSTER_CONFIG}
         fi
 
     - name: Delete Cluster
@@ -154,8 +154,8 @@ runs:
       env:
         ATLAS_GITHUB_ACTION: "true" 
       run: |
-        atlas cluster delete ${{ inputs.delete-cluster-name }} --force --projectId ${{ inputs.delete-project-id }}
-        if ! atlas cluster watch ${{ inputs.delete-cluster-name }} --projectId ${{ inputs.delete-project-id }} >/dev/null 2>&1; then
+        atlas cluster delete "${{ inputs.delete-cluster-name }}" --force --projectId "${{ inputs.delete-project-id }}"
+        if ! atlas cluster watch "${{ inputs.delete-cluster-name }}" --projectId "${{ inputs.delete-project-id }}" >/dev/null 2>&1; then
           echo "Atlas Cluster '${{ inputs.delete-cluster-name }}' is deleted"
           exit 0
         fi
@@ -166,7 +166,7 @@ runs:
       env:
         ATLAS_GITHUB_ACTION: "true" 
       run: | 
-        atlas project delete ${{ inputs.delete-project-id }} --force
+        atlas project delete "${{ inputs.delete-project-id }}" --force
 
     - name: Setup
       if: ${{ inputs.run-setup == 'true' && inputs.username && inputs.password }}
