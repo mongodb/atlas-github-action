@@ -126,7 +126,7 @@ jobs:
             MONGODB_ATLAS_PRIVATE_API_KEY: "" 
             MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
             MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
-        uses: mongodb/atlas-github-action@v0.2.1
+        uses: mongodb/atlas-github-action@v0.2.2
         id: create-project
         with:
           create-project-name: ${{ github.run_id }}-project3
@@ -136,7 +136,7 @@ jobs:
             MONGODB_ATLAS_PRIVATE_API_KEY: ""
             MONGODB_ATLAS_CLIENT_ID: ${{ steps.generate_sa.outputs.client-id }}
             MONGODB_ATLAS_CLIENT_SECRET: ${{ steps.generate_sa.outputs.client-secret }}
-        uses: mongodb/atlas-github-action@v0.2.1
+        uses: mongodb/atlas-github-action@v0.2.2
         with:
           delete-project-id: ${{ steps.create-project.outputs.create-project-id }}
 
