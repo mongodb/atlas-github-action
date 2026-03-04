@@ -1,0 +1,95 @@
+
+---
+  # This workflow automatically creates JIRA tickets when GitHub issues are opened
+  # and closes JIRA tickets when GitHub issues are closed.
+  #
+  # Required secrets:
+  # - JIRA_API_TOKEN: Your JIRA API token
+  #
+  name: Create and close JIRA tickets for GitHub issues
+  
+  on:
+    issues:
+      types: [opened, closed]
+  
+  permissions:
+    issues: write
+    contents: read
+  
+  jobs:
+    jira_task:
+      name: Create Jira issue
+      runs-on: ubuntu-latest
+      if: github.event.action == 'opened'
+      steps:
+        - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+          with:
+            config: ${{ vars.PERMISSIONS_CONFIG }}
+        - name: Create JIRA ticket
+          uses: mongodb/apix-action/create-jira@v13
+          id: create
+          with:
+            token: ${{ secrets.JIRA_API_TOKEN }}
+            project-key: CLOUDP
+            summary: "HELP: GitHub Issue n. ${{ github.event.issue.number }}"
+            issuetype: Story
+            description: "This ticket tracks the following GitHub issue: ${{ github.event.issue.html_url }}."
+            components: AtlasCLI
+            assignee: ${{ vars.ASSIGNEE_JIRA_TICKET }}
+            extra-data: |
+              {
+                "fields": {
+                  "fixVersions": [
+                    {
+                      "name": "Not Applicable"
+                    }
+                  ],
+                  "customfield_12751": [
+                    {
+                      "id": "22223"
+                    }
+                  ],
+                  "customfield_10257": {
+                    "id": "11861"
+                  }
+                }
+              }
+        - name: Add comment
+          uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9
+          with:
+            issue-number: ${{ github.event.issue.number }}
+            body: |
+              Thanks for opening this issue. The ticket [${{ steps.create.outputs.issue-key }}](https://jira.mongodb.org/browse/${{ steps.create.outputs.issue-key }}) was created for internal tracking.
+  
+    close_jira_task:
+      name: Close Jira issue
+      runs-on: ubuntu-latest
+      if: github.event.action == 'closed'
+      steps:
+        - uses: GitHubSecurityLab/actions-permissions/monitor@v1
+          with:
+            config: ${{ vars.PERMISSIONS_CONFIG }}
+
+        - name: Find JIRA ticket by GitHub issue number
+          id: find_jira
+          uses: mongodb/apix-action/find-jira@v13
+          with:
+            token: ${{ secrets.JIRA_API_TOKEN }}
+            jql: "project = CLOUDP AND description ~ '${{ github.event.issue.html_url }}'"
+
+        - name: Close JIRA ticket
+          if: steps.find_jira.outputs.found == 'true'
+          uses: mongodb/apix-action/transition-jira@v13
+          id: close_jira_ticket
+          continue-on-error: true
+          with:
+            token: ${{ secrets.JIRA_API_TOKEN }}
+            issue-key: ${{ steps.find_jira.outputs.issue-key }}
+            transition-id: 1381 # Resolved
+        - name: Add closure comment
+          if: steps.close_jira_ticket.outcome == 'success'
+          uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9
+          with:
+            issue-number: ${{ github.event.issue.number }}
+            body: |
+              The corresponding JIRA ticket has been automatically closed.
