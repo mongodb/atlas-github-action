@@ -5,5 +5,3 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    reviewers:
-      - "mongodb/apix-2"
