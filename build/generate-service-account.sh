@@ -27,12 +27,13 @@ if [ -z "$MONGODB_ATLAS_ORG_ID" ]; then
   exit 1
 fi
 if [ -z "$MONGODB_ATLAS_OPS_MANAGER_URL" ]; then
-  echo "MONGODB_ATLAS_ORG_ID env var is not set"
+  echo "MONGODB_ATLAS_OPS_MANAGER_URL env var is not set"
   exit 1
 fi
 
-output=$(
-    curl --user "${MONGODB_ATLAS_PUBLIC_API_KEY}:${MONGODB_ATLAS_PRIVATE_API_KEY}" \
+if ! output=$(
+    curl --silent --show-error --fail-with-body \
+    --user "${MONGODB_ATLAS_PUBLIC_API_KEY}:${MONGODB_ATLAS_PRIVATE_API_KEY}" \
     --digest \
     --header "Accept: application/vnd.atlas.2025-03-12+json" \
     --header "Content-Type: application/json" \
@@ -45,10 +46,17 @@ output=$(
     ],
     "secretExpiresAfterHours": 8
     }'
-)
+); then
+  echo "Failed to create service account. Response:"
+  echo "$output"
+  exit 1
+fi
 
 client_id=$(echo "$output" | jq -r '.clientId')
 client_secret=$(echo "$output" | jq -r '.secrets[0].secret')
+if [ -n "$client_secret" ] && [ "$client_secret" != "null" ]; then
+  echo "::add-mask::$client_secret"
+fi
 
 if [ -z "$client_id" ] || [ "$client_id" = "null" ] || [ -z "$client_secret" ] || [ "$client_secret" = "null" ]; then
   echo "Failed to create service account. Response:"
